@@ -1,9 +1,5 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CICD
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on:
   push:
     branches:
@@ -26,20 +22,25 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v2
       with:
-        go-version: '1.15.0' # The Go version to download (if necessary) and use.
+        go-version: '1.15.0'
     
     - name: Install dependencies
       run: |
         go version
         go get -u golang.org/x/lint/golint
+        go mod download
         
     - name: Run build
-      run: go build . 
+      run: go build ./pkg
       
     - name: Run vet & lint
       run: |
-        go vet .
-        golint .
+        go vet ./pkg
+        go vet ./test
+        go vet ./internal
+        golint ./pkg
+        golint ./pkg
+        golint ./internal
     
     - name: Run testing
-      run: cd test && go test -v
+      run: go test ./test -v
