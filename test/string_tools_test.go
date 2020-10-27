@@ -1,7 +1,7 @@
 package test
 
 import (
-	. "github.com/davidlukac/go-pleasant-vault-client/internal"
+	. "github.com/davidlukac/go-pleasant-vault-client/pkg/client"
 	"testing"
 )
 
