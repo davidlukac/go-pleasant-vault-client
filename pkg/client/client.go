@@ -3,7 +3,6 @@ package client
 import (
 	"encoding/json"
 	"fmt"
-	. "github.com/davidlukac/go-pleasant-vault-client/internal"
 	"github.com/joho/godotenv"
 	"io/ioutil"
 	"log"
