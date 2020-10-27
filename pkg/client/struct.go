@@ -1,4 +1,4 @@
-package pkg
+package client
 
 type Secret struct {
 	Username         string            `json:"username"`
