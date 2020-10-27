@@ -3,44 +3,44 @@ name: CICD
 on:
   push:
     branches:
-    - master
-    - feature/*
-    - develop
+      - master
+      - feature/*
+      - develop
   pull_request:
     branches:
-    - master
-    - feature/*
-    - develop
+      - master
+      - feature/*
+      - develop
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    
-    - name: Setup Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: '1.15.0'
-    
-    - name: Install dependencies
-      run: |
-        go version
-        go get -u golang.org/x/lint/golint
-        go mod download
-        
-    - name: Run build
-      run: go build ./pkg
-      
-    - name: Run vet & lint
-      run: |
-        go vet ./pkg
-        go vet ./test
-        go vet ./internal
-        golint ./pkg
-        golint ./pkg
-        golint ./internal
-    
-    - name: Run testing
-      run: go test ./test -v
+      - uses: actions/checkout@v2
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.15.0'
+
+      - name: Install dependencies
+        run: |
+          go version
+          go get -u golang.org/x/lint/golint
+          go mod download
+
+      - name: Run build
+        run: go build ./pkg/client
+
+      - name: Run vet & lint
+        run: |
+          go vet ./pkg/client
+          go vet ./test
+          go vet ./internal
+          golint ./pkg/client
+          golint ./test
+          golint ./internal
+
+      - name: Run testing
+        run: go test ./test -v
