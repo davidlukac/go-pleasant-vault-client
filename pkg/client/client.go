@@ -3,29 +3,36 @@ package client
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/joho/godotenv"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 )
 
-func GetSecret(uuid string) Secret {
-	pleasant := loadAndValidateEnv()
-	log.Printf("Connecting to Pleasant with '%s:%s@%s'.\n", pleasant.Username, ObfuscatePassword(pleasant.Password), pleasant.Url)
+type Client struct {
+	url      string
+	username string
+	password string
+}
 
-	token := getToken(pleasant)
-	secret := getSecret(pleasant, token, uuid)
+func NewClient(url string, username string, password string) Client {
+	return Client{url, username, password}
+}
+
+func (c Client) GetSecret(uuid string) Secret {
+	log.Printf("Connecting to Pleasant with '%s:%s@%s'.\n", c.username, ObfuscatePassword(c.password), c.url)
+
+	token := c.getToken()
+	secret := c.getSecret(token, uuid)
 
 	return secret
 }
 
-func getSecret(pleasant Pleasant, token string, uuid string) Secret {
+func (c Client) getSecret(token string, uuid string) Secret {
 	var err error
 
-	secretUrl := fmt.Sprintf("%s/api/v4/rest/credential/%s", pleasant.Url, uuid)
+	secretUrl := fmt.Sprintf("%s/api/v4/rest/credential/%s", c.url, uuid)
 
 	req, err := http.NewRequest(http.MethodGet, secretUrl, nil)
 	if err != nil {
@@ -62,15 +69,15 @@ func getSecret(pleasant Pleasant, token string, uuid string) Secret {
 	return secret
 }
 
-func getToken(pleasant Pleasant) string {
+func (c Client) getToken() string {
 	var err error
 
-	tokenUrl := fmt.Sprintf("%s/OAuth2/Token", pleasant.Url)
+	tokenUrl := fmt.Sprintf("%s/OAuth2/Token", c.url)
 
 	postData := url.Values{}
 	postData.Set("grant_type", "password")
-	postData.Set("username", pleasant.Username)
-	postData.Set("password", pleasant.Password)
+	postData.Set("username", c.username)
+	postData.Set("password", c.password)
 
 	req, err := http.NewRequest(http.MethodPost, tokenUrl, strings.NewReader(postData.Encode()))
 	if err != nil {
@@ -103,32 +110,4 @@ func getToken(pleasant Pleasant) string {
 	}
 
 	return tokenResponse.AccessToken
-}
-
-func loadAndValidateEnv() Pleasant {
-	err := godotenv.Overload(".env", ".local.env")
-
-	if err != nil {
-		panic(err)
-	}
-
-	var pleasant Pleasant
-
-	pleasant.Url = strings.TrimSpace(os.Getenv(PleasantUrlVar))
-	pleasant.Username = strings.TrimSpace(os.Getenv(PleasantUsernameVar))
-	pleasant.Password = strings.TrimSpace(os.Getenv(PleasantPasswordVar))
-
-	if strings.TrimSpace(pleasant.Url) == "" {
-		panic(fmt.Sprintf("Environment variable '%s' must be set!", PleasantUrlVar))
-	}
-
-	if strings.TrimSpace(pleasant.Username) == "" {
-		panic(fmt.Sprintf("Environment variable '%s' must be set!", PleasantUrlVar))
-	}
-
-	if strings.TrimSpace(pleasant.Password) == "" {
-		panic(fmt.Sprintf("Environment variable '%s' must be set!", PleasantUrlVar))
-	}
-
-	return pleasant
 }
