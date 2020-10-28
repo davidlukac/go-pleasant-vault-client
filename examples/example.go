@@ -8,6 +8,6 @@ import (
 
 func Test(t *testing.T) {
 	c := client.NewClient("https://vault.foobar.com", "some.username", "asdf3ih43")
-	s := c.GetSecret("b29031b3-3951-41c9-b0bf-06fc69366559")
+	s := c.GetSecret("b29031b3-a1dd-q2wq-1as4e-06fc69366559")
 	fmt.Println(s)
 }
