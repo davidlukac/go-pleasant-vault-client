@@ -84,7 +84,9 @@ func (c Vault) getToken() string {
 
 	defer func() {
 		err = resp.Body.Close()
-		log.Println(err)
+		if err != nil {
+			log.Println(err)
+		}
 	}()
 
 	body, err := ioutil.ReadAll(resp.Body)
