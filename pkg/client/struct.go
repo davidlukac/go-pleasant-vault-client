@@ -1,11 +1,13 @@
 package client
 
+// Vault represents Pleasant Vault instance.
 type Vault struct {
-	Url      string
+	URL      string
 	Username string
 	Password string
 }
 
+// Secret object as returned from Pleasant Vault.
 type Secret struct {
 	Username         string            `json:"username"`
 	Password         string            `json:"password"`

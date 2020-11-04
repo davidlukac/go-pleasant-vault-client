@@ -10,8 +10,9 @@ import (
 	"strings"
 )
 
+// GetSecret - Fetch and return Secret from the Vault for given UUID.
 func (c Vault) GetSecret(uuid string) Secret {
-	log.Printf("Connecting to Pleasant Vault with '%s:%s@%s'.\n", c.Username, ObfuscatePassword(c.Password), c.Url)
+	log.Printf("Connecting to Pleasant Vault with '%s:%s@%s'.\n", c.Username, ObfuscatePassword(c.Password), c.URL)
 
 	token := c.getToken()
 	secret := c.getSecret(token, uuid)
@@ -22,9 +23,9 @@ func (c Vault) GetSecret(uuid string) Secret {
 func (c Vault) getSecret(token string, uuid string) Secret {
 	var err error
 
-	secretUrl := fmt.Sprintf("%s/api/v4/rest/credential/%s", c.Url, uuid)
+	secretURL := fmt.Sprintf("%s/api/v4/rest/credential/%s", c.URL, uuid)
 
-	req, err := http.NewRequest(http.MethodGet, secretUrl, nil)
+	req, err := http.NewRequest(http.MethodGet, secretURL, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -62,14 +63,14 @@ func (c Vault) getSecret(token string, uuid string) Secret {
 func (c Vault) getToken() string {
 	var err error
 
-	tokenUrl := fmt.Sprintf("%s/OAuth2/Token", c.Url)
+	tokenURL := fmt.Sprintf("%s/OAuth2/Token", c.URL)
 
 	postData := url.Values{}
 	postData.Set("grant_type", "password")
 	postData.Set("username", c.Username)
 	postData.Set("password", c.Password)
 
-	req, err := http.NewRequest(http.MethodPost, tokenUrl, strings.NewReader(postData.Encode()))
+	req, err := http.NewRequest(http.MethodPost, tokenURL, strings.NewReader(postData.Encode()))
 	if err != nil {
 		panic(err)
 	}
