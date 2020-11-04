@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// ObfuscatePassword scrambles middle part of a sensitive string and replaces it with asterisks.
 func ObfuscatePassword(password string) string {
 	var res string
 

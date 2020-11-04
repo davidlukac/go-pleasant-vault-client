@@ -5,6 +5,7 @@ import (
 	"net/url"
 )
 
+// ParseUUID takes a string - either an UUID or an URL - and tries to parse out the UUID part.
 func ParseUUID(s string, queryKey string) string {
 	if queryKey == "" {
 		queryKey = "itemId"

@@ -10,18 +10,9 @@ import (
 	"strings"
 )
 
-type Client struct {
-	url      string
-	username string
-	password string
-}
-
-func NewClient(url string, username string, password string) Client {
-	return Client{url, username, password}
-}
-
-func (c Client) GetSecret(uuid string) Secret {
-	log.Printf("Connecting to Pleasant with '%s:%s@%s'.\n", c.username, ObfuscatePassword(c.password), c.url)
+// GetSecret - Fetch and return Secret from the Vault for given UUID.
+func (c Vault) GetSecret(uuid string) Secret {
+	log.Printf("Connecting to Pleasant Vault with '%s:%s@%s'.\n", c.Username, ObfuscatePassword(c.Password), c.URL)
 
 	token := c.getToken()
 	secret := c.getSecret(token, uuid)
@@ -29,12 +20,12 @@ func (c Client) GetSecret(uuid string) Secret {
 	return secret
 }
 
-func (c Client) getSecret(token string, uuid string) Secret {
+func (c Vault) getSecret(token string, uuid string) Secret {
 	var err error
 
-	secretUrl := fmt.Sprintf("%s/api/v4/rest/credential/%s", c.url, uuid)
+	secretURL := fmt.Sprintf("%s/api/v4/rest/credential/%s", c.URL, uuid)
 
-	req, err := http.NewRequest(http.MethodGet, secretUrl, nil)
+	req, err := http.NewRequest(http.MethodGet, secretURL, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -69,17 +60,17 @@ func (c Client) getSecret(token string, uuid string) Secret {
 	return secret
 }
 
-func (c Client) getToken() string {
+func (c Vault) getToken() string {
 	var err error
 
-	tokenUrl := fmt.Sprintf("%s/OAuth2/Token", c.url)
+	tokenURL := fmt.Sprintf("%s/OAuth2/Token", c.URL)
 
 	postData := url.Values{}
 	postData.Set("grant_type", "password")
-	postData.Set("username", c.username)
-	postData.Set("password", c.password)
+	postData.Set("username", c.Username)
+	postData.Set("password", c.Password)
 
-	req, err := http.NewRequest(http.MethodPost, tokenUrl, strings.NewReader(postData.Encode()))
+	req, err := http.NewRequest(http.MethodPost, tokenURL, strings.NewReader(postData.Encode()))
 	if err != nil {
 		panic(err)
 	}
@@ -92,7 +83,12 @@ func (c Client) getToken() string {
 		panic(err)
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		err = resp.Body.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
