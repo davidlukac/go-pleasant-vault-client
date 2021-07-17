@@ -9,14 +9,16 @@ import (
 	"strings"
 )
 
+// GetRootFolder returns ID of the root folder.
 func (c Vault) GetRootFolder() string {
 	token := c.getToken()
 	return c.getRootFolder(token)
 }
 
-func (c Vault) GetFolder(folderId string) *Folder {
+// GetFolder returns Folder object for given ID.
+func (c Vault) GetFolder(folderID string) *Folder {
 	token := c.getToken()
-	response := c.getFolder(token, folderId)
+	response := c.getFolder(token, folderID)
 
 	folder := Folder{}
 	folder.Id = response.Id
@@ -28,12 +30,13 @@ func (c Vault) GetFolder(folderId string) *Folder {
 	return &folder
 }
 
-// CreateFolder
+// CreateFolder creates new Folder from provided object and returns updated self.
 // POST    /api/v5/rest/folders
 func (c Vault) CreateFolder(folder *Folder) *Folder {
 	token := c.getToken()
-	newFolderId := c.createFolder(token, folder)
-	folder = c.GetFolder(newFolderId)
+	newFolderID := c.createFolder(token, folder)
+	folder = c.GetFolder(newFolderID)
+
 	return folder
 }
 
@@ -43,12 +46,12 @@ func (c Vault) createFolder(token string, folder *Folder) string {
 
 	rootFolderURL := fmt.Sprintf("%s/api/v5/rest/folders", c.URL)
 
-	folderJson, err := json.Marshal(&folder)
+	folderJSON, err := json.Marshal(&folder)
 	if err != nil {
 		panic(err)
 	}
 
-	req, err := http.NewRequest(http.MethodPost, rootFolderURL, bytes.NewBuffer(folderJson))
+	req, err := http.NewRequest(http.MethodPost, rootFolderURL, bytes.NewBuffer(folderJSON))
 	if err != nil {
 		panic(err)
 	}
@@ -117,10 +120,10 @@ func (c Vault) getRootFolder(token string) string {
 }
 
 // GET    /api/v5/rest/folders/{folderId:guid}
-func (c Vault) getFolder(token string, folderId string) *folderResponse {
+func (c Vault) getFolder(token string, folderID string) *folderResponse {
 	var err error
 
-	rootFolderURL := fmt.Sprintf("%s/api/v5/rest/folders/%s", c.URL, folderId)
+	rootFolderURL := fmt.Sprintf("%s/api/v5/rest/folders/%s", c.URL, folderID)
 
 	req, err := http.NewRequest(http.MethodGet, rootFolderURL, nil)
 	if err != nil {

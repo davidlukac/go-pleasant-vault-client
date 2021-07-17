@@ -10,14 +10,16 @@ import (
 	"strings"
 )
 
+// CreateEntry create a secret Entry from given object and returns updated Entry.
 func (c Vault) CreateEntry(entry *Secret) *Secret {
 	token := c.getToken()
-	newEntryId := c.createEntry(token, entry)
-	newEntry := c.getSecret(token, newEntryId)
+	newEntryID := c.createEntry(token, entry)
+	newEntry := c.getSecret(token, newEntryID)
 
 	return &newEntry
 }
 
+// PatchEntry updates existing entry with given ID with values from given JSON patch.
 func (c Vault) PatchEntry(id string, jsonPatch string) {
 	token := c.getToken()
 	c.patchEntry(token, id, jsonPatch)
@@ -46,12 +48,12 @@ func (c Vault) createEntry(token string, entry *Secret) string {
 
 	rootFolderURL := fmt.Sprintf("%s/api/v5/rest/entries", c.URL)
 
-	entryJson, err := json.Marshal(&entry)
+	entryJSON, err := json.Marshal(&entry)
 	if err != nil {
 		panic(err)
 	}
 
-	req, err := http.NewRequest(http.MethodPost, rootFolderURL, bytes.NewBuffer(entryJson))
+	req, err := http.NewRequest(http.MethodPost, rootFolderURL, bytes.NewBuffer(entryJSON))
 	if err != nil {
 		panic(err)
 	}
@@ -86,9 +88,9 @@ func (c Vault) createEntry(token string, entry *Secret) string {
 func (c Vault) patchEntry(token string, id string, jsonPatch string) {
 	var err error
 
-	entryUrl := fmt.Sprintf("%s/api/v5/rest/entries/%s", c.URL, id)
+	entryURL := fmt.Sprintf("%s/api/v5/rest/entries/%s", c.URL, id)
 
-	req, err := http.NewRequest(http.MethodPatch, entryUrl, bytes.NewBuffer([]byte(jsonPatch)))
+	req, err := http.NewRequest(http.MethodPatch, entryURL, bytes.NewBuffer([]byte(jsonPatch)))
 	if err != nil {
 		panic(err)
 	}
@@ -120,9 +122,9 @@ func (c Vault) patchEntry(token string, id string, jsonPatch string) {
 func (c Vault) getPassword(token string, id string) string {
 	var err error
 
-	passwordUrl := fmt.Sprintf("%s/api/v5/rest/entries/%s/password", c.URL, id)
+	passwordURL := fmt.Sprintf("%s/api/v5/rest/entries/%s/password", c.URL, id)
 
-	req, err := http.NewRequest(http.MethodGet, passwordUrl, nil)
+	req, err := http.NewRequest(http.MethodGet, passwordURL, nil)
 	if err != nil {
 		panic(err)
 	}
