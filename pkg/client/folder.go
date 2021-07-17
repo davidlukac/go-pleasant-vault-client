@@ -21,9 +21,9 @@ func (c Vault) GetFolder(folderID string) *Folder {
 	response := c.getFolder(token, folderID)
 
 	folder := Folder{}
-	folder.Id = response.Id
+	folder.ID = response.ID
 	folder.Name = response.Name
-	folder.ParentId = response.ParentId
+	folder.ParentID = response.ParentID
 	folder.Children = response.Children
 	folder.Credentials = response.Credentials
 

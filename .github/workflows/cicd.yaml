@@ -35,12 +35,8 @@ jobs:
 
       - name: Run vet & lint
         run: |
-          go vet ./pkg/client
-          go vet ./test
-          go vet ./internal
-          golint ./pkg/client
-          golint ./test
-          golint ./internal
+          find . -type f -name "*.go" -printf %h\\n | uniq | xargs go vet
+          find . -type f -name "*.go" -printf %h\\n | uniq | xargs golint
 
       - name: Run testing
         run: go test ./test -v
