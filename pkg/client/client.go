@@ -23,7 +23,7 @@ func (c Vault) GetSecret(uuid string) Secret {
 func (c Vault) getSecret(token string, uuid string) Secret {
 	var err error
 
-	secretURL := fmt.Sprintf("%s/api/v4/rest/credential/%s", c.URL, uuid)
+	secretURL := fmt.Sprintf("%s/api/v5/rest/credential/%s", c.URL, uuid)
 
 	req, err := http.NewRequest(http.MethodGet, secretURL, nil)
 	if err != nil {
